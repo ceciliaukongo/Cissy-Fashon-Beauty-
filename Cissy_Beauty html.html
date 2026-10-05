@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cissy's Fashion & Beautyhub | Outfit Inspiration</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f8f5f2;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .page-controller,
+    .menu-controller,
+    .like-controller,
+    .slide-controller {
+      display: none;
+    }
+
+    header {
+      background: #111;
+      color: white;
+      padding: 20px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .logo label {
+      cursor: pointer;
+    }
+
+    nav .nav-links {
+      display: flex;
+      align-items: center;
+    }
+
+    nav .nav-item {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      transition: 0.3s;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    nav .nav-item:hover {
+      color: #d4a373;
+    }
+
+    .menu-toggle {
+      display: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .page-view {
+      display: none;
+      opacity: 0;
+    }
+
+    #tab-home:checked ~ #page-home,
+    #tab-outfits:checked ~ #page-outfits,
+    #tab-lifestyle:checked ~ #page-lifestyle,
+    #tab-beauty:checked ~ #page-beauty,
+    #tab-contact:checked ~ #page-contact {
+      display: block;
+      opacity: 1;
+    }
+
+    #tab-home:checked ~ header #nav-home,
+    #tab-outfits:checked ~ header #nav-outfits,
+    #tab-lifestyle:checked ~ header #nav-lifestyle,
+    #tab-beauty:checked ~ header #nav-beauty,
+    #tab-contact:checked ~ header #nav-contact {
+      color: #d4a373;
+      border-bottom: 2px solid #d4a373;
+      padding-bottom: 4px;
+    }
+
+    .section-title {
+      text-align: center;
+      margin: 50px 0 10px;
+      font-size: 36px;
+      letter-spacing: 1px;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 16px;
+    }
+
+    .hero {
+      height: 85vh;
+      background:
+        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+        url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200&auto=format&fit=crop')
+        center/cover no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      padding: 0 20px;
+    }
+
+    .hero-content {
+      background: rgba(0,0,0,0.5);
+      padding: 40px;
+      border-radius: 15px;
+      max-width: 600px;
+    }
+
+    .hero h1 {
+      font-size: 50px;
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background: #d4a373;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: 0.3s;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #b5835a;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      padding: 0 40px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .card img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+    }
+
+    .like-label {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 20px;
+      transition: 0.2s;
+      user-select: none;
+      z-index: 10;
+    }
+
+    #like1:checked ~ .card .like-label[for="like1"],
+    #like2:checked ~ .card .like-label[for="like2"],
+    #like3:checked ~ .card .like-label[for="like3"] {
+      color: #e63946;
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .card-content .tag {
+      display: inline-block;
+      background: #f0e6df;
+      color: #b5835a;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .card-content h3 {
+      margin-bottom: 10px;
+    }
+
+    .card-content p {
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .journal-banner {
+      background: #eaddcf;
+      padding: 40px;
+      text-align: center;
+      max-width: 1120px;
+      margin: 0 auto 40px;
+      border-radius: 15px;
+    }
+
+    .journal-banner h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .journal-banner p {
+      color: #555;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .slider-container {
+      max-width: 800px;
+      margin: 0 auto 50px;
+      position: relative;
+      height: 450px;
+      overflow: hidden;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .slides {
+      width: 300%;
+      height: 100%;
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .slide {
+      width: 33.333%;
+      height: 100%;
+      position: relative;
+    }
+
+    .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .slide-text {
+      position: absolute;
+      bottom: 3em;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      color: white;
+      width: 100%;
+      padding: 40px 20px 20px;
+    }
+
+    #slide1:checked ~ .slider-container .slides {
+      transform: translateX(0%);
+    }
+
+    #slide2:checked ~ .slider-container .slides {
+      transform: translateX(-33.333%);
+    }
+
+    #slide3:checked ~ .slider-container .slides {
+      transform: translateX(-66.666%);
+    }
+
+    .slider-nav {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 20;
+    }
+
+    .slider-nav label {
+      display: inline-block;
+      width: 120px;
+      background: rgba(255,255,255,0.4);
+      color: #111;
+      padding: 6px 10px;
+      margin-left: 5px;
+      border-radius: 20px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    #slide1:checked ~ .slider-container .slider-nav label[for="slide1"],
+    #slide2:checked ~ .slider-container .slider-nav label[for="slide2"],
+    #slide3:checked ~ .slider-container .slider-nav label[for="slide3"] {
+      background: #d4a373;
+      color: white;
+    }
+
+    .contact-container {
+      max-width: 900px;
+      margin: 0 auto 60px;
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 40px;
+    }
+
+    .contact-info h3 {
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    .contact-info p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .contact-details {
+      margin-top: 30px;
+    }
+
+    .contact-method {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .contact-icon {
+      background: #f0e6df;
+      color: #b5835a;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-right: 15px;
+      font-weight: bold;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+      background: #fbfbfb;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: #d4a373;
+    }
+
+    .submit-btn {
+      background: #111;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .submit-btn:hover {
+      background: #d4a373;
+    }
+
+    #mock-response {
+      display: none;
+      margin-top: 10px;
+      padding: 14px;
+      border-radius: 10px;
+      background: #f0e6df;
+      color: #7a5c45;
+      line-height: 1.6;
+      font-size: 14px;
+      border-left: 4px solid #d4a373;
+    }
+
+    footer {
+      background: #111;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: auto;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 20px;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      nav .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #111;
+        padding: 20px 0;
+      }
+
+      #mobile-menu-trigger:checked ~ header nav .nav-links {
+        display: flex;
+      }
+
+      nav .nav-item {
+        margin: 10px 0;
+        font-size: 18px;
+        width: 100%;
+        text-align: center;
+        display: block;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .content-grid {
+        padding: 0 20px 40px;
+      }
+
+      .contact-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 20px;
+      }
+
+      .slider-container {
+        height: 350px;
+      }
+
+      .slider-nav label {
+        width: 70px;
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <input type="radio" name="navigation" id="tab-home" class="page-controller" checked>
+  <input type="radio" name="navigation" id="tab-outfits" class="page-controller">
+  <input type="radio" name="navigation" id="tab-lifestyle" class="page-controller">
+  <input type="radio" name="navigation" id="tab-beauty" class="page-controller">
+  <input type="radio" name="navigation" id="tab-contact" class="page-controller">
+
+  <input type="checkbox" id="mobile-menu-trigger" class="menu-controller">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <label for="tab-home">Cissy's Fashion & Beautyhub</label>
+    </div>
+
+    <nav>
+      <label for="mobile-menu-trigger" class="menu-toggle">☰</label>
+
+      <div class="nav-links">
+        <label for="tab-home" class="nav-item" id="nav-home">Home</label>
+        <label for="tab-outfits" class="nav-item" id="nav-outfits">Outfits</label>
+        <label for="tab-lifestyle" class="nav-item" id="nav-lifestyle">Lifestyle</label>
+        <label for="tab-beauty" class="nav-item" id="nav-beauty">Beauty</label>
+        <label for="tab-contact" class="nav-item" id="nav-contact">Contact</label>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Home -->
+  <main id="page-home" class="page-view">
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Fashion & Lifestyle</h1>
+        <p>Elegant outfit inspiration for modern university girls.</p>
+
+        <label for="tab-outfits" class="btn">
+          Explore Looks
+        </label>
+      </div>
+    </section>
+  </main>
+
+  <!-- Outfits -->
+  <main id="page-outfits" class="page-view">
+    <h2 class="section-title">Outfit Inspiration</h2>
+
+    <p class="section-subtitle">
+      Curated styles engineered for your weekday campus walks and weekend breaks.
+    </p>
+
+    <section class="content-grid">
+
+      <!-- Card 1 -->
+      <div>
+        <input type="checkbox" id="like1" class="like-controller">
+
+        <div class="card">
+          <label for="like1" class="like-label">♥</label>
+
+          <img
+            src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=600&auto=format&fit=crop"
+            alt="Casual Look"
+          >
+
+          <div class="card-content">
+            <span class="tag">Casual</span>
+
+            <h3>Casual Chic</h3>
+
+            <p>
+              Simple jeans, white sneakers, and oversized blazers
+              for a classy everyday look.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div>
+        <input type="checkbox" id="like2" class="like-controller">
+
+        <div class="card">
+          <label for="like2" class="like-label">♥</label>
+
+          <img
+            src="https://images.unsplash.com/photo-1554412933-514a83d2f3c8?q=80&w=600&auto=format&fit=crop"
+            alt="Street Style"
+          >
+
+          <div class="card-content">
+            <span class="tag">Streetwear</span>
+
+            <h3>Street Style</h3>
+
+            <p>
+              Trendy streetwear outfits inspired by
+              Gen Z fashion aesthetics.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div>
+        <input type="checkbox" id="like3" class="like-controller">
+
+        <div class="card">
+          <label for="like3" class="like-label">♥</label>
+
+          <img
+            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=600&auto=format&fit=crop"
+            alt="Luxury Fashion"
+          >
+
+          <div class="card-content">
+            <span class="tag">Luxury</span>
+
+            <h3>Luxury Elegance</h3>
+
+            <p>
+              Soft neutral tones and luxury-inspired fashion
+              for elegant occasions.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Lifestyle -->
+  <main id="page-lifestyle" class="page-view">
+
+    <h2 class="section-title">Lifestyle Diary</h2>
+
+    <p class="section-subtitle">
+      Balancing university modules, curated routines, and clean spaces.
+    </p>
+
+    <div class="journal-banner">
+      <h3>
+        "Your environment shapes your aesthetic productivity."
+      </h3>
+
+      <p>
+        Dive into regular updates on designing standard workspace zones,
+        finding cozy corner spots for study logs, and curating your
+        schedule without burnouts.
+      </p>
+    </div>
+
+    <section class="content-grid">
+
+      <!-- Lifestyle Card 1 -->
+      <div class="card">
+        <img
+          src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop"
+          alt="Desk setup"
+        >
+
+        <div class="card-content">
+          <span class="tag">Spaces</span>
+
+          <h3>Aesthetic Study Rooms</h3>
+
+          <p>
+            How to organize a clean desk environment that
+            maximizes creative flow and focus.
+          </p>
+        </div>
+      </div>
+
+      <!-- Lifestyle Card 2 -->
+      <div class="card">
+        <img
+          src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=600&auto=format&fit=crop"
+          alt="Morning coffee"
+        >
+
+        <div class="card-content">
+          <span class="tag">Routines</span>
+
+          <h3>My 6 AM Morning Routine</h3>
+
+          <p>
+            The structured habits that set up a successful day
+            before campus lectures begin.
+          </p>
+        </div>
+      </div>
+
+      <!-- Lifestyle Card 3 -->
+      <div class="card">
+        <img
+          src="https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?q=80&w=600&auto=format&fit=crop"
+          alt="Journaling"
+        >
+
+        <div class="card-content">
+          <span class="tag">Mindset</span>
+
+          <h3>Digital Zen Practices</h3>
+
+          <p>
+            Simple strategies for handling social stress
+            and building true offline confidence.
+          </p>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Beauty -->
+  <main id="page-beauty" class="page-view">
+
+    <h2 class="section-title">Beauty & Glow</h2>
+
+    <p class="section-subtitle">
+      Minimalist skin procedures and fast makeup logs for active students.
+    </p>
+
+    <input type="radio" name="slider" id="slide1" class="slide-controller" checked>
+    <input type="radio" name="slider" id="slide2" class="slide-controller">
+    <input type="radio" name="slider" id="slide3" class="slide-controller">
+
+    <div class="slider-container">
+
+      <div class="slides">
+
+        <!-- Slide 1 -->
+        <div class="slide">
+          <img
+            src="https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=1000&auto=format&fit=crop"
+            alt="Skincare routine"
+          >
+
+          <div class="slide-text">
+            <h3>Step 1: Deep Morning Hydration</h3>
+
+            <p>
+              Using hyaluronic bases to lock down hydration
+              before long lecture hall blocks.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide">
+          <img
+            src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=1000&auto=format&fit=crop"
+            alt="Makeup collection"
+          >
+
+          <div class="slide-text">
+            <h3>Step 2: The 5-Minute Campus Face</h3>
+
+            <p>
+              Minimal tints, brushed brows, and tinted oils
+              for a flawless clean look.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="slide">
+          <img
+            src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1000&auto=format&fit=crop"
+            alt="Night routine"
+          >
+
+          <div class="slide-text">
+            <h3>Step 3: PM Skin Recovery</h3>
+
+            <p>
+              Cleansing impurities away from daily pollution
+              exposure and balancing skin barriers.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="slider-nav">
+        <label for="slide1">Hydration</label>
+        <label for="slide2">Quick Look</label>
+        <label for="slide3">Night Routine</label>
+      </div>
+    </div>
+  </main>
+
+  <!-- Contact -->
+  <main id="page-contact" class="page-view">
+
+    <h2 class="section-title">Let's Work Together</h2>
+
+    <p class="section-subtitle">
+      Drop a message or reach out for inquiries and corporate brand alignment.
+    </p>
+
+    <section class="contact-container">
+
+      <!-- Contact Info -->
+      <div class="contact-info">
+
+        <h3>Contact Channels</h3>
+
+        <p>
+          I am always excited to talk about styling portfolios,
+          collaborative reviews, or editorial creation projects.
+        </p>
+
+        <div class="contact-details">
+
+          <div class="contact-method">
+            <div class="contact-icon">@</div>
+
+            <div>
+              <strong>Email Us</strong>
+              <p>aweye@cissyshub.com</p>
+            </div>
+          </div>
+
+          <div class="contact-method">
+            <div class="contact-icon">📍</div>
+
+            <div>
+              <strong>Location Hub</strong>
+              <p>Juba, Munuki</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <form class="contact-form" onsubmit="showMockMessage(event)">
+
+        <div class="form-group">
+          <input type="text" placeholder="Your Name" required>
+        </div>
+
+        <div class="form-group">
+          <input type="email" placeholder="Your Email Address" required>
+        </div>
+
+        <div class="form-group">
+          <textarea
+            placeholder="Write your styling inquiry details here..."
+            rows="5"
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          Send Message
+        </button>
+
+        <p id="mock-response"></p>
+
+      </form>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      © 2026 Cissy's Fashion & Beautyhub |
+      Fashion & Lifestyle Blog
+    </p>
+  </footer>
+
+  <!-- Mock Form Logic -->
+  <script>
+    function showMockMessage(event) {
+      event.preventDefault();
+
+      const messageBox = document.getElementById("mock-response");
+
+      messageBox.style.display = "block";
+
+      messageBox.innerHTML = `
+        ⚠ Message delivery system is currently not connected
+        to a backend server.<br><br>
+
+        Please send your inquiry directly to:
+        <strong>aweye@cissyshub.com</strong>
+      `;
+    }
+  </script>
+
+</body>
+</html>
